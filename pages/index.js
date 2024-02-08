@@ -2,6 +2,8 @@
 
 import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
+import { Fragment } from "react";
+import Head from "next/head";
 
 // const DUMMY_MEETUPS = [
 //   {
@@ -31,10 +33,21 @@ import MeetupList from "../components/meetups/MeetupList";
 // ];
 
 function HomePage(props) {
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <Fragment>
+      <Head>
+        <title>React Meetups</title>
+        <meta
+          name="description"
+          content="Browse a huge list of highly active React meetups!"
+        />
+      </Head>
+      <MeetupList meetups={props.meetups} />;
+    </Fragment>
+  );
 }
 
-export async function getStaticProps(){
+export async function getStaticProps() {
   // fetch data from an API
 
   const client = await MongoClient.connect(
@@ -42,22 +55,22 @@ export async function getStaticProps(){
   );
   const db = client.db();
   const meetupsCollection = db.collection("meetups");
-  const meetups = await meetupsCollection.find().toArray()
-  client.close()
+  const meetups = await meetupsCollection.find().toArray();
+  client.close();
   // //or
   // const response = await fetch("/api/meetups")
   // const meetups = await response.json()     // these not work comes error
 
-  return{
-      props: {   
-          meetups: meetups.map(meetup => ({
-            title: meetup.title,
-            address: meetup.address,
-            image: meetup.image,
-            id: meetup._id.toString()
-          }))
-      },
-      revalidate: 1
-    }
+  return {
+    props: {
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
+      })),
+    },
+    revalidate: 1,
+  };
 }
 export default HomePage;
